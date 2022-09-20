@@ -4,6 +4,8 @@ import static android.content.ContentValues.TAG;
 
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.Toast;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
@@ -42,6 +44,13 @@ public class MainActivity extends AppCompatActivity {
 
         Log.d(TAG,"onCreate was called");
 
+
+    }
+
+    //floating button action
+    public void OnClickFloating(View view){
+        Toast.makeText(getApplicationContext(),"Click on floating plus", Toast.LENGTH_LONG).show();
+        Log.d(TAG,"onCreate was called");
     }
 
 }
