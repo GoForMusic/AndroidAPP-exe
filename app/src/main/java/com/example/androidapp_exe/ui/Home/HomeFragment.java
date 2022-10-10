@@ -32,14 +32,17 @@ public class HomeFragment extends Fragment {
 
         textView = root.findViewById(R.id.text_home);
 
-        homeViewModel.getText().observe(getViewLifecycleOwner(), new Observer<Integer>() {
-            @Override
-            public void onChanged(Integer integer) {
-                textView.setText(integer);
-            }
+        homeViewModel.getText().observe(getViewLifecycleOwner(),number->{
+            textView.setText(String.valueOf(number));
         });
 
-
+        Button button = root.findViewById(R.id.button);
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                homeViewModel.Increment();
+            }
+        });
 
         return root;
     }
