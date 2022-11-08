@@ -1,23 +1,28 @@
 package com.example.androidapp_exe.ViewModel;
 
 
+import android.app.Activity;
+import android.app.Application;
+
+import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.ViewModel;
 
-import com.example.androidapp_exe.Entity.News;
-import com.example.androidapp_exe.Entity.NewsResponse;
-import com.example.androidapp_exe.Model.NewsRepository;
+import com.example.androidapp_exe.Entity.User;
+import com.example.androidapp_exe.Model.UserRepository;
 
 import java.util.ArrayList;
 
-public class HomeViewModel extends ViewModel {
-    NewsRepository repository;
+public class HomeViewModel extends AndroidViewModel {
+    UserRepository repository;
 
-    public HomeViewModel(){
-        repository = NewsRepository.getInstance();
+    public HomeViewModel(Application app){
+        super(app);
+        repository = UserRepository.getInstance(app);
     }
 
-    public LiveData<NewsResponse> getNews(String country, int size, AdapterNews adapterNews){
-        return repository.getNews(country, size, adapterNews);
+    public void registerAccount(Activity activity, User user, String password)
+    {
+        repository.registerAccount(activity,user,password);
     }
 }
