@@ -11,6 +11,11 @@
         android:label="@string/title_home"
         tools:layout="@layout/fragment_home" />
 
+    <fragment
+        android:id="@+id/navigation_portfolio"
+        android:name="com.example.androidapp_exe.ui.Home.PortfolioFragment"
+        android:label="@string/title_home"
+        tools:layout="@layout/fragment_portfolio" />
 
 
 </navigation>
