@@ -9,6 +9,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -30,6 +31,9 @@ public class HomeFragment extends Fragment {
     private HomeViewModel homeViewModel;
 
     private Button registerButton;
+    private TextView textTest;
+
+    private User localUserStore;
 
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
        homeViewModel = new ViewModelProvider(this).get(HomeViewModel.class);
@@ -38,23 +42,52 @@ public class HomeFragment extends Fragment {
         View root = binding.getRoot();
 
         registerButton  = root.findViewById(R.id.button);
+        textTest = root.findViewById(R.id.textTest);
+
+        homeViewModel.getUser("Tix7vZ54m4cXLPNlygPTeOG7w7i2").observe(getViewLifecycleOwner(),user -> {
+
+            textTest.setText(user.toString());
+            localUserStore = user;
+        });
 
         registerButton.setOnClickListener(new View.OnClickListener(){
+
             @Override
             public void onClick(View view) {
-                try {
-                    User local = new User();
-                    local.setFirstName("Militaru");
-                    local.setLastName("Adrian");
-                    local.setEmail("goformusicro@gmail.com");
-                    local.setWalletUid(null);
-                    homeViewModel.registerAccount((Activity) getView().getContext(),local,"test1234567");
-                }catch (NullPointerException e){
-                    Toast.makeText(getActivity(), e.getMessage(), Toast.LENGTH_SHORT).show();
-                }
+                //CreateUser();
+
+                UpdateUser();
+                //System.out.println(homeViewModel.getUser("Tix7vZ54m4cXLPNlygPTeOG7w7i2"));
             }
         });
 
         return root;
+    }
+
+    private void UpdateUser()
+    {
+        localUserStore.setLastName("Cristian");
+        System.out.println(localUserStore);
+
+        homeViewModel.updateUser(localUserStore);
+
+        //user.setLastName("Cristian");
+        //homeViewModel.updateUser(user,"Tix7vZ54m4cXLPNlygPTeOG7w7i2");
+
+    }
+
+    private void CreateUser()
+    {
+        try {
+            User local = new User();
+            local.setFirstName("Militaru");
+            local.setLastName("Adrian");
+            local.setEmail("goformusicro@gmail.com");
+            local.setWalletUid(null);
+            homeViewModel.registerAccount((Activity) getView().getContext(),local,"test1234567");
+
+        }catch (NullPointerException e){
+            Toast.makeText(getActivity(), e.getMessage(), Toast.LENGTH_SHORT).show();
+        }
     }
 }

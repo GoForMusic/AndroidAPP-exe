@@ -3,8 +3,17 @@ package com.example.androidapp_exe.Entity;
 public class Crypto {
     private String uid;
     private String cryptoName;
+    private float value;
 
     public Crypto() {
+    }
+
+    public float getValue() {
+        return value;
+    }
+
+    public void setValue(float valueæ) {
+        this.value = valueæ;
     }
 
     public String getUid() {

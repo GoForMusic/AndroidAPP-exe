@@ -17,5 +17,14 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/text_home" />
 
+    <TextView
+        android:id="@+id/textTest"
+        android:gravity="center"
+        android:layout_width="match_parent"
+        android:layout_height="545dp"
+        tools:text="kjguigu">
+
+
+    </TextView>
 
 </FrameLayout>

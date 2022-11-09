@@ -19,14 +19,19 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firestore.v1.WriteResult;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class UserDAO {
+public class UserDAO implements IUserDAO {
     private final UserLiveData currentUser;
     private final Application app;
     private static UserDAO instance;
@@ -46,11 +51,13 @@ public class UserDAO {
     private FirebaseFirestore firebaseDatabase;
 
     User returnedUser;
-    User userModal = new User();
+    MutableLiveData<User> userModal;
 
     private UserDAO(Application app) {
         this.app = app;
         currentUser = new UserLiveData();
+
+        userModal=new MutableLiveData<>(new User());
 
         firebaseAuth = FirebaseAuth.getInstance();
         firebaseDatabase = FirebaseFirestore.getInstance();
@@ -63,11 +70,36 @@ public class UserDAO {
         return instance;
     }
 
-    public LiveData<FirebaseUser> getCurrentUser() {
-        return currentUser;
+
+    //
+
+
+    private void createUser(String uid, User userParam) {
+
+        User user = new User();
+        user.setEmail(userParam.getEmail());
+        user.setLastName(userParam.getLastName());
+        user.setFirstName(userParam.getFirstName());
+        user.setUid(uid);
+        user.setWalletUid(null);
+
+        firebaseDatabase.collection("users").document(uid).set(user)
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        Log.d(TAG, "User created successfully!");
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.w(TAG, "Error writing the user", e);
+                    }
+                });
     }
 
-    public void registerAccount(Activity activity, User user, String password) {
+    @Override
+    public void addUser(Activity activity, User user, String password) {
         try{
             firebaseAuth.createUserWithEmailAndPassword(user.getEmail(), password)
                     .addOnCompleteListener(activity, new OnCompleteListener<AuthResult>() {
@@ -93,49 +125,53 @@ public class UserDAO {
         }
     }
 
-
-    public void createUser(String uid, User userParam) {
-
-        User user = new User();
-        user.setEmail(userParam.getEmail());
-        user.setLastName(userParam.getLastName());
-        user.setFirstName(userParam.getFirstName());
-        user.setUid(uid);
-        user.setWalletUid(null);
-
-        firebaseDatabase.collection("users").document(uid).set(user)
+    @Override
+    public void removeUser(User user) {
+        firebaseDatabase.collection("users").document(user.getUid())
+                .delete()
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
-                        Log.d(TAG, "User created successfully!");
+                        Log.d(TAG, "DocumentSnapshot successfully deleted!");
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
-                        Log.w(TAG, "Error writing the user", e);
+                        Log.w(TAG, "Error deleting document", e);
                     }
                 });
     }
 
-    public LiveData<User> getUser() {
-        return user;
+    @Override
+    public void updateUser(User newUser) {
+
+        DocumentReference docRef = firebaseDatabase.collection("users").document(newUser.getUid());
+        //updates fields
+        docRef.update("email",newUser.getEmail());
+        docRef.update("lastName",newUser.getLastName());
+        docRef.update("firstName",newUser.getFirstName());
+        docRef.update("walletUid",newUser.getWalletUid());
+
+
     }
 
-    public User getUserModal(String uid) {
-        DocumentReference docRef = firebaseDatabase.collection("users").document(uid);
-        docRef.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-            @Override
-            public void onSuccess(DocumentSnapshot documentSnapshot) {
-                userModal = documentSnapshot.toObject(User.class);
-            }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                Log.e(TAG, e.getMessage());
-            }
-        });
-        return userModal;
+    @Override
+    public MutableLiveData<User> getUser(String uid) {
+             firebaseDatabase.collection("users").whereEqualTo("uid",uid).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                @Override
+                public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                    if (task.isSuccessful()) {
+                        for (QueryDocumentSnapshot document : task.getResult()) {
+                            Log.d(TAG, document.getId() + " => " + document.getData());
+                            User local = document.toObject(User.class);
+                            userModal.postValue(local);
+                        }
+                    } else {
+                        Log.d(TAG, "Error getting documents: ", task.getException());
+                    }
+                }
+            });
+            return userModal;
     }
-
 }

@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.Application;
 
 import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
 
 import com.example.androidapp_exe.Entity.User;
 import com.example.androidapp_exe.Model.DAO.UserDAO;
@@ -26,10 +27,20 @@ public class UserRepository {
 
 
     public void registerAccount(Activity activity, User user, String password) {
-        userDAO.registerAccount(activity, user, password);
+        userDAO.addUser(activity, user, password);
     }
 
-    public LiveData<User> getUser() {
-        return userDAO.getUser();
+    public MutableLiveData<User> getUser(String uid) {
+        return userDAO.getUser(uid);
+    }
+
+    public void removeUser(User user)
+    {
+        userDAO.removeUser(user);
+    }
+
+    public void updateUser(User user)
+    {
+        userDAO.updateUser(user);
     }
 }

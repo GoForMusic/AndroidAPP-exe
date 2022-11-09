@@ -8,6 +8,8 @@ public class Wallet {
     private ArrayList<Crypto> cryptos;
 
     public Wallet() {
+        walletBallanceUSD = 0;
+        cryptos = new ArrayList<>();
     }
 
     public String getUid() {
@@ -19,6 +21,13 @@ public class Wallet {
     }
 
     public float getWalletBallanceUSD() {
+
+        if(cryptos.size()!=0){
+            for (Crypto value: cryptos) {
+                walletBallanceUSD += value.getValue();
+            }
+        }
+
         return walletBallanceUSD;
     }
 
